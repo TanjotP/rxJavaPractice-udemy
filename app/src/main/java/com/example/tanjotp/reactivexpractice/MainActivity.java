@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private io.reactivex.Observable<String> myObservable;
     private Observer<String> myObserver;
     private TextView mTextView;
+    private Disposable mDisposable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSubscribe(final Disposable d) {
                 Log.i(TAG, "onSubscribe");
+                mDisposable = d;
             }
 
             @Override
@@ -58,5 +60,11 @@ public class MainActivity extends AppCompatActivity {
         };
 
         myObservable.subscribe(myObserver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDisposable.dispose();
     }
 }
