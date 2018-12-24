@@ -35,10 +35,6 @@ public class MainActivity extends AppCompatActivity {
         mTextView=findViewById(R.id.greetingsText);
         myObservable = io.reactivex.Observable.just(greeting);
 
-        myObservable.subscribeOn(Schedulers.io());
-
-        myObservable.observeOn(AndroidSchedulers.mainThread());
-
         myObserver = new DisposableObserver<String>() {
             @Override
             public void onNext(final String s) {
@@ -58,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mCompositeDisposable.add(myObserver);
-        myObservable.subscribe(myObserver);
+        mCompositeDisposable.add(
+                myObservable.
+                        subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(myObserver)
+        );
 
         myObserver2 = new DisposableObserver<String>() {
             @Override
@@ -81,8 +81,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mCompositeDisposable.add(myObserver2);
-        myObservable.subscribe(myObserver2);
+        mCompositeDisposable.add(
+                myObservable.subscribeWith(myObserver2)
+        );
 
     }
 
