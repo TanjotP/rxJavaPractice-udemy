@@ -13,6 +13,7 @@ import java.util.Observable;
 
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -52,13 +53,23 @@ public class MainActivity extends AppCompatActivity {
                 myObservable.
                         subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .map(new Function<Student, Student>() { //input , output
+                        .flatMap(new Function<Student, ObservableSource<?>>() {
+                            @Override
+
+                            public ObservableSource<?> apply(final Student student) throws Exception {
+                                Student studentDisguisedAsTeacher=new Student();
+                                studentDisguisedAsTeacher.setName(student.getName());
+                                studentDisguisedAsTeacher.setName("Teacher disguised as StudentModel");
+                                return io.reactivex.Observable.just(student,studentDisguisedAsTeacher);
+                            }
+                        })
+                        /*.map(new Function<Student, Student>() { //map" input item , output item ||| flatmap" input item, outputs observable
                             @Override
                             public Student apply(final Student student) throws Exception {
                                 student.setName(student.getName().toUpperCase());
                                 return student;
                             }
-                        })
+                        })*/
                         .subscribeWith(getObserver())
 
         );
