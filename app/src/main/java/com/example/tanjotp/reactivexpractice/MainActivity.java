@@ -10,7 +10,10 @@ import android.widget.TextView;
 import java.util.Observable;
 
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -24,6 +27,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mTextView=findViewById(R.id.greetingsText);
         myObservable = io.reactivex.Observable.just(greeting);
+
+        myObservable.subscribeOn(Schedulers.io());
+
+        myObservable.observeOn(AndroidSchedulers.mainThread());
+
         myObserver = new Observer<String>() {
             @Override
             public void onSubscribe(final Disposable d) {
