@@ -20,6 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = "MainActivity";
 
-    private io.reactivex.Observable<Student> myObservable;
+    private io.reactivex.Observable<Integer> myObservable;
     private DisposableObserver<Student> myObserver;
 
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
@@ -37,6 +38,38 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        myObservable = myObservable.range(1,20);
+        myObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(new Predicate<Integer>() {
+                    @Override
+                    public boolean test(final Integer integer) throws Exception {
+                        return integer%3==0;
+                    }
+                })
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onSubscribe(final Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(final Integer integer) {
+                        Log.i(TAG, "onNext " + integer);
+
+                    }
+
+                    @Override
+                    public void onError(final Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                })
+        /*
         myObservable = io.reactivex.Observable.create(new ObservableOnSubscribe<Student>() {
             @Override
             public void subscribe(final ObservableEmitter<Student> emitter) throws Exception {
@@ -53,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 myObservable.
                         subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
+
                         .flatMap(new Function<Student, ObservableSource<?>>() {
                             @Override
 
@@ -63,16 +97,16 @@ public class MainActivity extends AppCompatActivity {
                                 return io.reactivex.Observable.just(student,studentDisguisedAsTeacher);
                             }
                         })
-                        /*.map(new Function<Student, Student>() { //map" input item , output item ||| flatmap" input item, outputs observable
+                        .map(new Function<Student, Student>() { //map" input item , output item ||| flatmap" input item, outputs observable
                             @Override
                             public Student apply(final Student student) throws Exception {
                                 student.setName(student.getName().toUpperCase());
                                 return student;
                             }
-                        })*/
+                        })
                         .subscribeWith(getObserver())
 
-        );
+        ); */
     }
 
     private DisposableObserver getObserver(){
