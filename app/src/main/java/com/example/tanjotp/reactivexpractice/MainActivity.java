@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete() {
 
                     }
-                })
+                });
         /*
         myObservable = io.reactivex.Observable.create(new ObservableOnSubscribe<Student>() {
             @Override
