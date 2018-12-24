@@ -20,76 +20,44 @@ import io.reactivex.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = "MainActivity";
-    private String greeting = "Hello From RxJava";
+    private String[] greetings = {"Hello Apple","Hello Banana","Hello Orange" };
     private io.reactivex.Observable<String> myObservable;
     private DisposableObserver<String> myObserver;
-    private DisposableObserver<String> myObserver2;
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
-    private TextView mTextView;
 
-    //private Disposable mDisposable;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mTextView=findViewById(R.id.greetingsText);
-        myObservable = io.reactivex.Observable.just(greeting);
 
-        myObserver = new DisposableObserver<String>() {
-            @Override
-            public void onNext(final String s) {
-                Log.i(TAG, "onNext");
-                mTextView.setText(s);
-            }
-
-            @Override
-            public void onError(final Throwable e) {
-                Log.i(TAG, "onError");
-            }
-
-            @Override
-            public void onComplete() {
-                 Log.i(TAG, "onComplete");
-
-            }
-        };
+        myObservable = io.reactivex.Observable.fromArray(greetings);
 
         mCompositeDisposable.add(
                 myObservable.
                         subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(myObserver)
+                        .subscribeWith(getObserver())
         );
+    }
 
-        myObserver2 = new DisposableObserver<String>() {
+    private DisposableObserver getObserver(){
+        myObserver = new DisposableObserver<String>() {
             @Override
             public void onNext(final String s) {
-                Log.i(TAG, "onNext");
-                mTextView.setText(s);
-                Toast.makeText(getApplicationContext(),s,Toast.LENGTH_SHORT);
+                Log.i(TAG, "onNext invoked " + s);
             }
 
             @Override
             public void onError(final Throwable e) {
-                Log.i(TAG, "onError");
+                Log.i(TAG, "onError invoked");
             }
 
             @Override
             public void onComplete() {
-                Log.i(TAG, "onComplete");
-
+                Log.i(TAG, "onComplete invoked");
             }
         };
 
-        mCompositeDisposable.add(
-                myObservable.subscribeWith(myObserver2)
-        );
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mCompositeDisposable.clear();
+        return myObserver;
     }
 }
