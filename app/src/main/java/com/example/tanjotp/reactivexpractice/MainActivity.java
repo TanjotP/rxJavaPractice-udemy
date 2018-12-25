@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = "MainActivity";
 
-    private io.reactivex.Observable<Integer> myObservable;
+    private io.reactivex.Observable<Integer> myObservable = io.reactivex.Observable.just(1,2,3,5,8,2,9,4);
     private DisposableObserver<Student> myObserver;
 
     private CompositeDisposable mCompositeDisposable = new CompositeDisposable();
@@ -38,8 +38,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myObservable = myObservable.range(1,20);
         myObservable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .skip(4)
+                .subscribe(new Observer<Integer>() {
+                               @Override
+                               public void onSubscribe(final Disposable d) {
+                               }
+
+                               @Override
+                               public void onNext(final Integer integer) {
+                                   Log.i(TAG, "onNext" + integer);
+                               }
+
+                               @Override
+                               public void onError(final Throwable e) {
+                               }
+
+                               @Override
+                               public void onComplete() {
+                               }
+                           });
+
+                        //myObservable = myObservable.range(1,20);
+
+        /*myObservable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(new Predicate<Integer>() {
                     @Override
